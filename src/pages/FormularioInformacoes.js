@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import InputMask from 'react-input-mask';
 import { useDropzone } from "react-dropzone";
+import axios from 'axios';
 
 function FormularioInformacoes() {
     const [nome, setNome] = useState('');
@@ -21,10 +22,31 @@ function FormularioInformacoes() {
         }
     })
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         // Lógica para enviar os dados para a API
-        console.log({ nome, telefone, localizacao, fotos })
+        const formData = new FormData();
+        formData.append('nome', nome);
+        formData.append('telefone', telefone);
+        formData.append('localizacao', localizacao);
+        fotos.forEach((foto) => formData.append('fotos', foto));
+
+        try {
+            const response = await axios.post('URL_DO_SEU_ENDPOINT', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log('Dados enviados com sucesso:', response.data);
+            // Limpar o formulário ou exibir uma mensagem de sucesso
+            setNome('');
+            setTelefone('');
+            setLocalizacao('');
+            setFotos([]);
+        } catch (error) {
+            console.error('Erro ao enviar dados:', error);
+            // Exibir uma mensagem de erro
+        }
     }
 
     return (
