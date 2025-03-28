@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { buscarDesaparecidoPorId } from '../services/api';
+import { buscaDesaparecidoPorId } from '../services/api'; // Corrigido aqui
 
 function DetalheDesaparecido() {
   const { id } = useParams();
@@ -8,7 +8,7 @@ function DetalheDesaparecido() {
 
   useEffect(() => {
     async function fetchData() {
-      const data = await buscarDesaparecidoPorId(id);
+      const data = await buscaDesaparecidoPorId(id); // Corrigido aqui
       if (data) {
         setDesaparecido(data);
       }
