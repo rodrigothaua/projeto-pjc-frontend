@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:3333'
+  baseURL: 'https://abitus-api.geia.vip/'
 })
 
 export const listarDesaparecidos = async () => {
