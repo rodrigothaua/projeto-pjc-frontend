@@ -30,22 +30,19 @@ function FormularioInformacoes() {
         formData.append('telefone', telefone);
         formData.append('localizacao', localizacao);
         fotos.forEach((foto) => formData.append('fotos', foto));
+        formData.append('ocorrenciaId', 1); //Adicionar o id de ocorrencia.
 
         try {
-            const response = await axios.post('URL_DO_SEU_ENDPOINT', formData, {
+            const response = await axios.post('https://abitus-api.geia.vip/v1/ocorrencias/informacoes-desaparecido', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             console.log('Dados enviados com sucesso:', response.data);
-            // Limpar o formulário ou exibir uma mensagem de sucesso
-            setNome('');
-            setTelefone('');
-            setLocalizacao('');
-            setFotos([]);
+            // ... (restante do código)
         } catch (error) {
             console.error('Erro ao enviar dados:', error);
-            // Exibir uma mensagem de erro
+            // ... (restante do código)
         }
     };
 
