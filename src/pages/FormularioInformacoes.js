@@ -9,7 +9,7 @@ function FormularioInformacoes() {
     const [localizacao, setLocalizacao] = useState('');
     const [fotos, setFotos] = useState([]);
 
-    const { getRootProps, getInputProps } = useDropzone ({
+    const { getRootProps, getInputProps } = useDropzone({
         accept: 'image/*',
         onDrop: (acceptedFiles) => {
             setFotos(
@@ -18,13 +18,13 @@ function FormularioInformacoes() {
                         preview: URL.createObjectURL(file),
                     })
                 )
-            )
+            );
         }
-    })
+    });
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // Lógica para enviar os dados para a API
+
         const formData = new FormData();
         formData.append('nome', nome);
         formData.append('telefone', telefone);
@@ -47,7 +47,7 @@ function FormularioInformacoes() {
             console.error('Erro ao enviar dados:', error);
             // Exibir uma mensagem de erro
         }
-    }
+    };
 
     return (
         <div>
@@ -81,8 +81,8 @@ function FormularioInformacoes() {
                         value={localizacao}
                         onChange={(e) => setLocalizacao(e.target.value)}
                     />
-                    </div>
-                    <div>
+                </div>
+                <div>
                     <label>Fotos:</label>
                     <div {...getRootProps()}>
                         <input {...getInputProps()} />
@@ -90,7 +90,7 @@ function FormularioInformacoes() {
                     </div>
                     <div>
                         {fotos.map((file) => (
-                        <img key={file.name} src={file.preview} alt={file.name} style={{ width: '100px', margin: '10px' }} />
+                            <img key={file.name} src={file.preview} alt={file.name} style={{ width: '100px', margin: '10px' }} />
                         ))}
                     </div>
                 </div>
