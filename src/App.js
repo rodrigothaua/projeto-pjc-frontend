@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ListaDesaparecidos from './components/ListaDesaparecidos';
-import DetalheDesaparecido from './pages/DetalheDesaparecido';
-import FormularioInformacoes from './pages/FormularioInformacoes';
+
+const ListaDesaparecidos = React.lazy(() => import('./components/ListaDesaparecidos'));
+const FormularioInformacoes = React.lazy(() => import('./pages/FormularioInformacoes'));
+const DetalheDesaparecido = React.lazy(() => import('./pages/DetalheDesaparecido')); 
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<ListaDesaparecidos />} />
-        <Route path="/detalhe/:id" element={<DetalheDesaparecido />} />
-        <Route path="/informacoes/:id" element={<FormularioInformacoes />} />
-      </Routes>
+      <Suspense fallback={<div>Carregando...</div>}>
+        <Routes>
+          <Route path="/" element={<ListaDesaparecidos />} />
+          <Route path="/formulario" element={<FormularioInformacoes />} />
+          <Route path="/detalhe/:id" element={<DetalheDesaparecido />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

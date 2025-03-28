@@ -1,20 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { buscaDesaparecidoPorId } from '../services/api'; // Corrigido aqui
+import { buscaDesaparecidoPorId } from '../services/api';
 
 function DetalheDesaparecido() {
   const { id } = useParams();
   const [desaparecido, setDesaparecido] = useState(null);
+  const [erro, setErro] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
-      const data = await buscaDesaparecidoPorId(id); // Corrigido aqui
-      if (data) {
-        setDesaparecido(data);
+      try {
+        const data = await buscaDesaparecidoPorId(id);
+        if (data) {
+          setDesaparecido(data);
+        } else {
+          setErro('Pessoa desaparecida não encontrada.');
+        }
+      } catch (error) {
+        setErro('Erro ao buscar detalhes do desaparecido: ' + error.message);
       }
     }
     fetchData();
   }, [id]);
+
+  if (erro) {
+    return <div>{erro}</div>;
+  }
 
   if (!desaparecido) {
     return <div>Carregando...</div>;
