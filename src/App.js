@@ -1,22 +1,35 @@
-import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
+import Loading from './components/Loading'
 
-const ListaDesaparecidos = React.lazy(() => import('./components/ListaDesaparecidos'));
-const FormularioInformacoes = React.lazy(() => import('./pages/FormularioInformacoes'));
-const DetalheDesaparecido = React.lazy(() => import('./pages/DetalheDesaparecido')); 
+const Listagem = lazy(() => import('./pages/Listagem'))
+const Detalhes = lazy(() => import('./pages/Detalhes'))
+const NotFound = lazy(() => import('./pages/NotFound'))
+
+function ErrorFallback({ error }) {
+  return (
+    <div className="p-4 text-red-500">
+      <h2>Ocorreu um erro:</h2>
+      <p>{error.message}</p>
+    </div>
+  )
+}
 
 function App() {
   return (
-    <Router>
-      <Suspense fallback={<div>Carregando...</div>}>
-        <Routes>
-          <Route path="/" element={<ListaDesaparecidos />} />
-          <Route path="/formulario" element={<FormularioInformacoes />} />
-          <Route path="/detalhe/:id" element={<DetalheDesaparecido />} />
-        </Routes>
-      </Suspense>
-    </Router>
-  );
+    <BrowserRouter>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route path="/" element={<Listagem />} />
+            <Route path="/detalhes/:id" element={<Detalhes />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
