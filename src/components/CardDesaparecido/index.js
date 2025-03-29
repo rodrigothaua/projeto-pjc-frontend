@@ -11,11 +11,24 @@ const CardDesaparecido = ({ pessoa }) => {
         src={pessoa.foto} 
         alt={pessoa.nome} 
         className={styles.foto}
+        onError={(e) => {
+          e.target.src = '/placeholder.png';
+        }}
       />
       <div className={styles.conteudo}>
         <h3 className={styles.nome}>{pessoa.nome}</h3>
-        <p className={styles.info}>Idade: {pessoa.idade}</p>
-        <p className={styles.situacao}>{pessoa.situacao}</p>
+        
+        <div className={styles.infoContainer}>
+          <p className={styles.info}>
+            <span className={styles.label}>Idade:</span> 
+            {pessoa.idade || 'Não informada'}
+          </p>
+          
+          <p className={`${styles.situacao} ${pessoa.situacao === 'DESAPARECIDO' ? styles.desaparecido : styles.localizado}`}>
+            {pessoa.situacao}
+          </p>
+        </div>
+
         <Link 
           to={`/detalhes/${pessoa.id}`} 
           className={styles.botao}
