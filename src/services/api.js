@@ -5,29 +5,63 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Interceptor para autenticação
-api.interceptors.request.use(async (config) => {
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Interceptor para tratamento global de erros
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('Erro na requisição:', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default {
-  // Autenticação
-  login: (credentials) => api.post('/login', credentials),
-  refreshToken: () => api.post('/refresh-token'),
+  getPessoa: async (id) => {
+    try {
+      const response = await api.get(`/pessoas/${id}`);
+      return {
+        ...response.data,
+        situacao: response.data.situacao || 'DESAPARECIDO', // Valor padrão
+        dataDesaparecimento: response.data.dataDesaparecimento || null
+      };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao buscar detalhes da pessoa');
+    }
+  },
 
-  // Pessoas
-  getPessoa: (id) => api.get(`/pessoas/${id}`),
-  listPessoasAberto: (params) => api.get('/pessoas/aberto', { params }),
-  searchPessoas: (filters) => api.get('/pessoas/aberto/filtro', { params: filters }),
+  listPessoasAberto: async (params) => {
+    try {
+      const response = await api.get('/pessoas/aberto', { params });
+      return {
+        ...response.data,
+        content: response.data.content.map(pessoa => ({
+          ...pessoa,
+          situacao: pessoa.situacao || 'DESAPARECIDO'
+        }))
+      };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao listar desaparecidos');
+    }
+  },
 
-  // Ocorrências
-  enviarInformacao: (data) => api.post('/ocorrencias/informacoes-desaparecido', data),
-  getMotivos: () => api.get('/ocorrencias/motivos'),
-
-  // Arquivos
-  getArquivo: (id) => api.get(`/arquivos/${id}`)
+  enviarInformacao: async (data) => {
+    try {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === 'arquivos') {
+          value.forEach(file => formData.append('arquivos', file));
+        } else {
+          formData.append(key, value);
+        }
+      });
+      
+      const response = await api.post('/ocorrencias/informacoes-desaparecido', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Erro ao enviar informações');
+    }
+  }
 };
