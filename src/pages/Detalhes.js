@@ -9,7 +9,7 @@ const Detalhes = () => {
   const [dados, setDados] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
-  const [modalAberto, setModalAberto] = useState(false); // Estado faltante
+  const [modalAberto, setModalAberto] = useState(false);
 
   useEffect(() => {
     const carregarDetalhes = async () => {
@@ -22,17 +22,15 @@ const Detalhes = () => {
 
         setDados({
           ...resposta,
-          situacao: resposta.vivo ? 'DESAPARECIDO' : 'LOCALIZADO',
-          dataDesaparecimentoFormatada: resposta.dataDesaparecimento 
+          dataFormatada: resposta.dataDesaparecimento 
             ? new Date(resposta.dataDesaparecimento).toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: 'long',
-                year: 'numeric'
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
               })
-            : 'Data desconhecida',
-          localDesaparecimento: resposta.ultimaOcorrencia?.localDesaparecimentoConcat || 'Local não informado',
-          vestimentas: resposta.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO?.vestimentasDesaparecido || 'Não informado',
-          informacoes: resposta.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO?.informacao || 'Não disponível'
+            : 'Data desconhecida'
         });
 
       } catch (error) {
@@ -70,6 +68,23 @@ const Detalhes = () => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Cabeçalho com espaçamento */}
         <div className={`p-6 ${dados.vivo ? 'bg-red-100' : 'bg-green-100'} flex justify-between items-start`}>
+          {/* Foto à esquerda */}
+          <div className='flex justify-center cursor-zoom-in'>
+            <img
+              src={dados.foto}
+              alt={`Foto de ${dados.nome}`}
+              className="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-transform duration-300 hover:scale-105"
+              onClick={() => setModalAberto(true)}
+              onError={(e) => e.target.src = '/images/placeholder.png'}
+            />
+          </div>
+          <ModalImagem
+              aberto={modalAberto}
+              onFechar={() => setModalAberto(false)}
+              imagemUrl={dados.foto || '/images/placeholder.png'}
+              nome={dados.nome}
+            />
+          {/* Informações principais */}
           <div className="ml-4 flex-1">
             <h1 className="text-3xl font-bold text-gray-800">{dados.nome}</h1>
             <div className="mt-2 flex items-center gap-3">
@@ -106,9 +121,9 @@ const Detalhes = () => {
               <h2 className="text-xl font-semibold mb-4">📅 Linha do Tempo</h2>
               <dl className="space-y-3">
                 <div>
-                  <dt className="font-medium text-gray-600">Data do Desaparecimento</dt>
+                  <dt className="font-medium text-gray-600">Data/Hora do Desaparecimento</dt>
                   <dd className="text-gray-800">
-                    {dados.dataDesaparecimentoFormatada}
+                    {dados.dataFormatada}
                   </dd>
                 </div>
                 <div>

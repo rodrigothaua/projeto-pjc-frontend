@@ -24,7 +24,7 @@ const CardDesaparecido = ({ pessoa }) => {
         src={dados.foto}
         alt={dados.nome}
         className="w-full h-48 object-cover border-b border-gray-100"
-        onError={(e) => e.target.src = '/placeholder.jpg'}
+        onError={(e) => e.target.src = '/images/placeholder.png'}
       />
       
       <div className="p-4 flex flex-col flex-1">
