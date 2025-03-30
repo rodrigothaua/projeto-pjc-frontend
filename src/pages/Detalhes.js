@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalImagem from '../components/ModalImagem';
+import FormularioInformacoes from '../components/FormularioInformacoes';
 
 const Detalhes = () => {
   const { id } = useParams();
@@ -10,20 +11,16 @@ const Detalhes = () => {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
   const [modalAberto, setModalAberto] = useState(false);
+  const [modalFormAberto, setModalFormAberto] = useState(false);
 
   useEffect(() => {
     const carregarDetalhes = async () => {
       try {
         const resposta = await api.getPessoa(id);
-        
-        if (!resposta) {
-          throw new Error('Dados não encontrados');
-        }
-
         setDados({
           ...resposta,
-          dataFormatada: resposta.dataDesaparecimento 
-            ? new Date(resposta.dataDesaparecimento).toLocaleDateString('pt-BR', {
+          dataFormatada: resposta.dtDesaparecimento // Corrigir nome do campo
+            ? new Date(resposta.dtDesaparecimento).toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric',
@@ -32,43 +29,39 @@ const Detalhes = () => {
               })
             : 'Data desconhecida'
         });
-
       } catch (error) {
         setErro(error.message);
       } finally {
         setCarregando(false);
       }
     };
-
     carregarDetalhes();
   }, [id]);
 
-  if (carregando) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  const handleCloseModais = () => {
+    setModalAberto(false);
+    setModalFormAberto(false);
+  };
 
-  if (erro) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500 text-center p-8 bg-red-50 rounded-lg">
-          {erro}
-        </div>
-      </div>
-    );
-  }
+  if (carregando) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+
+  if (erro) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-red-500 text-center p-8 bg-red-50 rounded-lg">{erro}</div>
+    </div>
+  );
 
   if (!dados) return null;
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Cabeçalho com espaçamento */}
+        {/* Cabeçalho */}
         <div className={`p-6 ${dados.vivo ? 'bg-red-100' : 'bg-green-100'} flex justify-between items-start`}>
-          {/* Foto à esquerda */}
           <div className='flex justify-center cursor-zoom-in'>
             <img
               src={dados.foto}
@@ -78,13 +71,7 @@ const Detalhes = () => {
               onError={(e) => e.target.src = '/images/placeholder.png'}
             />
           </div>
-          <ModalImagem
-              aberto={modalAberto}
-              onFechar={() => setModalAberto(false)}
-              imagemUrl={dados.foto || '/images/placeholder.png'}
-              nome={dados.nome}
-            />
-          {/* Informações principais */}
+
           <div className="ml-4 flex-1">
             <h1 className="text-3xl font-bold text-gray-800">{dados.nome}</h1>
             <div className="mt-2 flex items-center gap-3">
@@ -101,7 +88,7 @@ const Detalhes = () => {
               </span>
             </div>
           </div>
-          
+
           <button 
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -113,7 +100,7 @@ const Detalhes = () => {
           </button>
         </div>
 
-        {/* Corpo Principal */}
+        {/* Conteúdo Principal */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Coluna Esquerda */}
           <div className="space-y-6">
@@ -122,24 +109,18 @@ const Detalhes = () => {
               <dl className="space-y-3">
                 <div>
                   <dt className="font-medium text-gray-600">Data/Hora do Desaparecimento</dt>
-                  <dd className="text-gray-800">
-                    {dados.dataFormatada}
-                  </dd>
+                  <dd className="text-gray-800">{dados.dataFormatada}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-gray-600">Última Localização</dt>
-                  <dd className="text-gray-800">
-                    {dados.localDesaparecimento || 'Localizaçõo não informada'}
-                  </dd>
+                  <dd className="text-gray-800">{dados.localDesaparecimento || 'Localização não informada'}</dd>
                 </div>
               </dl>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg">
               <h2 className="text-xl font-semibold mb-4">👕 Vestimentas</h2>
-              <p className="text-gray-800 whitespace-pre-line">
-                {dados.vestimentas}
-              </p>
+              <p className="text-gray-800 whitespace-pre-line">{dados.vestimentas}</p>
             </div>
           </div>
 
@@ -147,33 +128,26 @@ const Detalhes = () => {
           <div className="space-y-6">
             <div className="bg-gray-50 p-4 rounded-lg">
               <h2 className="text-xl font-semibold mb-4">📝 Detalhes do Caso</h2>
-              <p className="text-gray-800 whitespace-pre-line">
-                {dados.informacoes}
-              </p>
+              <p className="text-gray-800 whitespace-pre-line">{dados.informacoes}</p>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg">
               <h2 className="text-xl font-semibold mb-4">📍 Local do Desaparecimento</h2>
-              <p className="text-gray-800">
-                {dados.localDesaparecimento}
-              </p>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <Link 
-                to={`/informacoes/${id}`}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              <p className="text-gray-800">{dados.localDesaparecimento}</p>
+              <button
+                onClick={() => setModalFormAberto(true)}
+                className="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
                 </svg>
                 Enviar Informações
-              </Link>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Seção de Fotos com ampliação */}
+        {/* Seção de Fotos */}
         {dados.urlFoto && (
           <div className="p-6 border-t border-gray-100">
             <h2 className="text-xl font-semibold mb-4">📸 Foto Registrada</h2>
@@ -188,16 +162,39 @@ const Detalhes = () => {
                 onError={(e) => e.target.src = '/images/placeholder.png'}
               />
             </div>
-            
-            <ModalImagem
-              aberto={modalAberto}
-              onFechar={() => setModalAberto(false)}
-              imagemUrl={dados.urlFoto || '/images/placeholder.png'}
-              nome={dados.nome}
-            />
           </div>
         )}
       </div>
+
+      {/* Modais */}
+      <ModalImagem
+        aberto={modalAberto}
+        onFechar={handleCloseModais}
+        imagemUrl={dados.foto || '/images/placeholder.png'}
+        nome={dados.nome}
+      />
+
+      {modalFormAberto && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Enviar Informações</h2>
+                <button
+                  onClick={handleCloseModais}
+                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                >
+                  &times;
+                </button>
+              </div>
+              <FormularioInformacoes 
+                idPessoa={id}
+                onClose={handleCloseModais}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
