@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import ModalImagem from '../components/ModalImagem';
 
@@ -158,6 +158,18 @@ const Detalhes = () => {
                 {dados.localDesaparecimento}
               </p>
             </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <Link 
+                to={`/informacoes/${id}`}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                </svg>
+                Enviar Informações
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -180,7 +192,7 @@ const Detalhes = () => {
             <ModalImagem
               aberto={modalAberto}
               onFechar={() => setModalAberto(false)}
-              imagemUrl={dados.urlFoto}
+              imagemUrl={dados.urlFoto || '/images/placeholder.png'}
               nome={dados.nome}
             />
           </div>
