@@ -23,11 +23,11 @@ const CardDesaparecido = ({ pessoa }) => {
       to={`/detalhes/${pessoa.id}`} 
       className="flex flex-col bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden h-full no-underline"
     >
-      <div className="relative w-full h-48">
+      <div className="relative w-full" style={{ height: '300px' }}>
         <img 
           src={dados.foto}
           alt={dados.nome}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-top transition-transform duration-500 hover:scale-105"
           onError={(e) => e.target.src = '/images/placeholder.png'}
         />
         <div className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold ${
