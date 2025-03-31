@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ListaDesaparecidos from '../components/ListaDesaparecidos';
-import api from '../services/api';
+import api from '../services/api';  // Importar o objeto api completo
 
 const Search = ({ initialQuery = '' }) => {
   const [searchParams] = useSearchParams();
@@ -10,14 +10,9 @@ const Search = ({ initialQuery = '' }) => {
   const [desaparecidos, setDesaparecidos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({
-    currentPage: 0,
-    totalPages: 0,
-    totalElements: 0
-  });
+  const [debugInfo, setDebugInfo] = useState(null);
 
   useEffect(() => {
-    // Atualiza o termo de pesquisa quando o parâmetro da URL muda
     setSearchTerm(queryParam);
   }, [queryParam]);
 
@@ -32,61 +27,66 @@ const Search = ({ initialQuery = '' }) => {
       setError(null);
 
       try {
-        // Usando o método buscarPorParametros do seu serviço API
-        const result = await api.buscarPorParametros({
-          nome: searchTerm,
-          pagina: 0
-          // Adicione outros parâmetros conforme necessário
-        });
+        // Tentativa 1: Usar buscarPorParametros
+        let result;
+        try {
+          result = await api.buscarPorParametros({  // Use api.buscarPorParametros
+            nome: searchTerm,
+            pagina: 0
+          });
+        } catch (err) {
+          console.log('Primeira tentativa falhou, tentando método alternativo');
+          
+          // Tentativa 2: Usar buscarPorNome
+          result = await api.buscarPorNome(searchTerm, 0);  // Use api.buscarPorNome
+        }
 
         setDesaparecidos(result.content);
-        setPagination({
-          currentPage: result.number,
-          totalPages: result.totalPages,
+        setDebugInfo({
+          searchTerm,
+          resultCount: result.content.length,
           totalElements: result.totalElements
         });
+        
       } catch (err) {
-        console.error('Erro ao buscar desaparecidos:', err);
-        setError(err.message || 'Ocorreu um erro ao buscar os dados. Por favor, tente novamente.');
+        console.error('Todas as tentativas falharam:', err);
+        
+        // Tentativa 3: Último recurso - buscar todos e filtrar no cliente
+        try {
+          console.log('Tentando buscar todos e filtrar no cliente');
+          const allPeople = await api.getPessoas(0);  // Use api.getPessoas
+          
+          // Filtrar no cliente
+          const filtered = allPeople.content.filter(pessoa => 
+            pessoa.nome.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+          
+          setDesaparecidos(filtered);
+          setDebugInfo({
+            method: 'client-side-filtering',
+            searchTerm,
+            resultCount: filtered.length,
+            totalFetched: allPeople.content.length
+          });
+          
+        } catch (finalError) {
+          setError('Não foi possível realizar a busca. Por favor, tente novamente mais tarde.');
+          setDebugInfo({
+            error: finalError.message,
+            originalError: err.message
+          });
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    // Debounce para evitar chamadas excessivas à API
     const timer = setTimeout(() => {
       fetchDesaparecidos();
     }, 500);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  // Função para carregar mais resultados (paginação)
-  const loadMoreResults = async () => {
-    if (loading || pagination.currentPage >= pagination.totalPages - 1) return;
-    
-    setLoading(true);
-    
-    try {
-      const nextPage = pagination.currentPage + 1;
-      const result = await api.buscarPorParametros({
-        nome: searchTerm,
-        pagina: nextPage
-      });
-      
-      setDesaparecidos(prev => [...prev, ...result.content]);
-      setPagination({
-        currentPage: result.number,
-        totalPages: result.totalPages,
-        totalElements: result.totalElements
-      });
-    } catch (err) {
-      console.error('Erro ao carregar mais resultados:', err);
-      setError(err.message || 'Erro ao carregar mais resultados.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -115,27 +115,23 @@ const Search = ({ initialQuery = '' }) => {
         <>
           <ListaDesaparecidos desaparecidos={desaparecidos} />
           
-          {pagination.currentPage < pagination.totalPages - 1 && (
-            <div className="text-center mt-8">
-              <button
-                onClick={loadMoreResults}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                disabled={loading}
-              >
-                {loading ? 'Carregando...' : 'Carregar mais resultados'}
-              </button>
-            </div>
-          )}
-          
-          <p className="text-center text-gray-500 mt-4">
-            Mostrando {desaparecidos.length} de {pagination.totalElements} resultados
+          <p className="text-center text-gray-500 mt-6">
+            Mostrando {desaparecidos.length} resultados
           </p>
         </>
       )}
       
-      {loading && desaparecidos.length === 0 && (
-        <div className="text-center py-8">
-          <p>Carregando resultados...</p>
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      )}
+      
+      {/* Informações de depuração - remova em produção */}
+      {process.env.NODE_ENV === 'development' && debugInfo && (
+        <div className="mt-8 p-4 bg-gray-100 rounded-md">
+          <h3 className="font-bold mb-2">Informações de Depuração</h3>
+          <pre className="text-xs overflow-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
         </div>
       )}
     </div>
