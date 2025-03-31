@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ListaDesaparecidos from '../components/ListaDesaparecidos';
 import api from '../services/api';  // Importar o objeto api completo
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Search = ({ initialQuery = '' }) => {
   const [searchParams] = useSearchParams();
@@ -88,6 +89,8 @@ const Search = ({ initialQuery = '' }) => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  useDocumentTitle(`Pesquisa por "${searchTerm}"`);
+
   return (
     <div className="max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Resultados da Pesquisa</h1>
@@ -124,14 +127,6 @@ const Search = ({ initialQuery = '' }) => {
       {loading && (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      )}
-      
-      {/* Informações de depuração - remova em produção */}
-      {process.env.NODE_ENV === 'development' && debugInfo && (
-        <div className="mt-8 p-4 bg-gray-100 rounded-md">
-          <h3 className="font-bold mb-2">Informações de Depuração</h3>
-          <pre className="text-xs overflow-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
         </div>
       )}
     </div>

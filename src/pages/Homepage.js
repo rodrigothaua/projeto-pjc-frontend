@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import CardDesaparecido from '../components/CardDesaparecido';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const HomePage = () => {
+    // Título "Abitus - Home"
+    useDocumentTitle('Home');
+    
     const [desaparecidos, setDesaparecidos] = useState([]);
     const [pagina, setPagina] = useState(0);
     const [totalPaginas, setTotalPaginas] = useState(0);
@@ -17,13 +21,13 @@ const HomePage = () => {
             console.error('Erro ao carregar dados:', error);
         }
         };
-        
+       
         carregarDados();
     }, [pagina]);
 
     return (
         <div className="container mx-auto px-4 py-8">
-        
+       
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {desaparecidos.map((pessoa) => (
             <CardDesaparecido key={pessoa.id} pessoa={pessoa} />

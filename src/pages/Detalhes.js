@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ModalImagem from '../components/ModalImagem';
 import FormularioInformacoes from '../components/FormularioInformacoes';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const Detalhes = () => {
   const { id } = useParams();
@@ -13,13 +14,15 @@ const Detalhes = () => {
   const [modalAberto, setModalAberto] = useState(false);
   const [modalFormAberto, setModalFormAberto] = useState(false);
 
+  useDocumentTitle(dados ? `Detalhes de ${dados.nome}` : 'Carregando detalhes...');
+
   useEffect(() => {
     const carregarDetalhes = async () => {
       try {
         const resposta = await api.getPessoa(id);
         setDados({
           ...resposta,
-          dataFormatada: resposta.dtDesaparecimento // Corrigir nome do campo
+          dataFormatada: resposta.dtDesaparecimento
             ? new Date(resposta.dtDesaparecimento).toLocaleDateString('pt-BR', {
                 day: '2-digit',
                 month: 'long',

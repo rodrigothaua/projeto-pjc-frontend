@@ -48,7 +48,7 @@ const Navbar = ({ onSearch }) => {
     <nav className="bg-gray-800 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-xl font-bold cursor-pointer" onClick={() => navigate('/')}>
-          Pessoas Desaparecidas
+          Abitus
         </div>
         
         {/* Campo de pesquisa para desktop */}
