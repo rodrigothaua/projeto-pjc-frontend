@@ -1,5 +1,16 @@
 # Projeto Abitus - Frontend
 
+## Dados de Inscrição
+
+Nome:
+Rodrigo Thauã Lima Barroso
+Matrícula: 
+Número da inscrição: 8857
+Perfil:
+DESENVOLVEDOR FRONT-END - JÚNIOR / PLENO
+
+
+
 ## Visão Geral
 
 Este projeto consiste no frontend do Sistema Abitus, uma aplicação web desenvolvida para auxiliar na gestão de informações sobre pessoas desaparecidas, integrando-se com a API Abitus da Polícia Judiciária Civil de Mato Grosso.
@@ -19,7 +30,7 @@ Siga estas etapas para configurar o ambiente de desenvolvimento:
 1.  **Clone o repositório:**
 
     ```bash
-    git clone [https://github.com/seu-usuario/projeto-pjc-frontend.git](https://github.com/seu-usuario/projeto-pjc-frontend.git)
+    git clone https://github.com/seu-usuario/projeto-pjc-frontend.git
     cd projeto-pjc-frontend
     ```
 
