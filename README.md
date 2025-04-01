@@ -2,12 +2,9 @@
 
 ## Dados de Inscrição
 
-Nome:
-Rodrigo Thauã Lima Barroso
-Matrícula: 
-Número da inscrição: 8857
-Perfil:
-DESENVOLVEDOR FRONT-END - JÚNIOR / PLENO
+**Nome:** Rodrigo Thauã Lima Barroso
+**Número da inscrição:** 8857
+**Perfil:** DESENVOLVEDOR FRONT-END - JÚNIOR / PLENO
 
 
 
